@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.*;
 import java.io.IOException;
 import java.util.HashMap;
 
@@ -11,10 +12,18 @@ public class Calculator {
     static final int buttonWidth = 100;
     static final int buttonHeight = 100;
     static HashMap<String, JButton> _btns = new HashMap<>();
-    static JLabel result;
-    static JLabel input;
+    private static JLabel result;
+    private static JLabel input;
 
     static JPanel _display;
+
+    protected void setResult(String res) {
+        result.setText(res);
+    }
+
+    protected void setInput(String str) {
+        input.setText(str);
+    }
 
     /* create a new window with the fixed window size */
     static void _initWindow() {
@@ -39,7 +48,8 @@ public class Calculator {
                 _tempMap.put("-", new JButton("-"));
                 _tempMap.put("x", new JButton("x"));
                 _tempMap.put("/", new JButton("/"));
-                _tempMap.get("=").setForeground(Color.blue);;
+                _tempMap.get("=").setForeground(Color.blue);
+                ;
             }
         }
         _btns = _tempMap;
@@ -49,7 +59,13 @@ public class Calculator {
         _display.setBounds(0, 0, windowWidth, displayHeight);
         _display.setBackground(Color.lightGray);
         result = new JLabel();
-        
+        input = new JLabel();
+        result.setBounds(10, 10, windowWidth - 20, 65);
+        input.setBounds(10, 75, windowWidth - 20, 65);
+        result.setText("0.0");
+        input.setText("0");
+        _display.add(result);
+        _display.add(input);
 
         _frame.add(_display, BorderLayout.NORTH);
 
@@ -98,20 +114,92 @@ public class Calculator {
                 _btns.get(Integer.toString(_iController)).setBounds(_btnFromLeft, _btnFromTop, buttonWidth,
                         buttonHeight);
                 _frame.add(_btns.get(Integer.toString(_iController)));
-                ///
-                _btnFromLeft +=(buttonWidth+ 10);
+                _btnFromLeft += (buttonWidth + 10);
                 _iController++;
             }
 
         }
     }
 
+    /* register all buttons for events */
+    static void _handleEvents() {
+        for (int i = 0; i < 11; i++) {
+            _btns.get(Integer.toString(i)).addActionListener(new ButtonEvent(true, i, null));
+        }
+        _btns.get("/").addActionListener(new ButtonEvent(false, -1, "/"));
+        _btns.get("x").addActionListener(new ButtonEvent(false, -1, "x"));
+        _btns.get("+").addActionListener(new ButtonEvent(false, -1, "+"));
+        _btns.get("-").addActionListener(new ButtonEvent(false, -1, "-"));
+        _btns.get("=").addActionListener(new ButtonEvent(false, -1, "="));
+        _btns.get(".").addActionListener(new ButtonEvent(false, -1, "."));
+    }
+
     public static void main(String[] args) throws IOException {
         _initWindow();
         _loadComponents();
         _addButtons();
-
         _frame.repaint();
+        _handleEvents();
     }
 
+}
+
+class ButtonEvent implements ActionListener {
+    final boolean isNum;
+    final int number;
+    final String operator;
+
+    ButtonEvent(boolean isNum, int number, String operator) {
+        this.isNum = isNum;
+        this.number = number;
+        this.operator = operator;
+
+    }
+
+    public void actionPerformed(ActionEvent e) {
+        _showInputString();
+    }
+
+    void _showInputString() {
+        InputBuffer _ib = InputBuffer.instance();
+        if (isNum == true) {
+            // super.setBuffer(Integer.toString(number));
+            _ib.setBuffer(Integer.toString(number),false);
+
+        } else if (operator != "=") {
+            // super.setBuffer(operator);
+            _ib.setBuffer(operator,false);
+        } else if (operator == "=") {
+
+            _ib.setBuffer("", true);
+        }
+
+        // super.setInput();
+    }
+}
+
+class InputBuffer extends Calculator {
+    private String _buffer = "";
+    private static InputBuffer _instance = null;
+
+    public static InputBuffer instance() {
+        if (_instance == null)
+            _instance = new InputBuffer();
+
+        return _instance;
+    }
+
+    public void setBuffer(String str, boolean clear) {
+        if (clear == true) {
+            _buffer = "";
+        } else {
+            _buffer += str;
+
+        }
+        super.setInput(_buffer);
+    }
+
+    public String getBuffer() {
+        return _buffer;
+    }
 }
