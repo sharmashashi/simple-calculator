@@ -41,7 +41,7 @@ public class Calculator {
         for (int i = 0; i <= 11; i++) {
             if (i <= 10) {
                 _tempMap.put(Integer.toString(i), new JButton(Integer.toString(i)));
-                _tempMap.get(Integer.toString(i)).setBackground(Color.GRAY);
+                _tempMap.get(Integer.toString(i)).setBackground(Color.WHITE);
             } else {
                 _tempMap.put(".", new JButton("."));
                 _tempMap.put("=", new JButton("="));
@@ -49,6 +49,7 @@ public class Calculator {
                 _tempMap.put("-", new JButton("-"));
                 _tempMap.put("*", new JButton("*"));
                 _tempMap.put("/", new JButton("/"));
+                _tempMap.get("=").setBackground(Color.green);
                 _tempMap.get("=").setForeground(Color.blue);
                 ;
             }
