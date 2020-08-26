@@ -3,6 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 public class Calculator {
     static JFrame _frame = new JFrame("Open Calculator");
@@ -29,7 +30,6 @@ public class Calculator {
     static void _initWindow() {
         _frame.setBackground(Color.WHITE);
         _frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
         _frame.setSize(new Dimension(windowWidth, windowHeight));
         _frame.setResizable(false);
         _frame.setVisible(true);
@@ -132,7 +132,7 @@ public class Calculator {
         _btns.get("+").addActionListener(new ButtonEvent(false, -1, "+"));
         _btns.get("-").addActionListener(new ButtonEvent(false, -1, "-"));
         _btns.get("=").addActionListener(new ButtonEvent(false, -1, "="));
-        _btns.get(".").addActionListener(new ButtonEvent(false, -1, "."));
+        // _btns.get(".").addActionListener(new ButtonEvent(false, -1, "."));
     }
 
     public static void main(String[] args) throws IOException {
@@ -146,7 +146,7 @@ public class Calculator {
 
 }
 
-class ButtonEvent implements ActionListener {
+class ButtonEvent extends Calculator implements ActionListener {
     final boolean isNum;
     final int number;
     final String operator;
@@ -162,26 +162,52 @@ class ButtonEvent implements ActionListener {
         _showInputString();
     }
 
+    String _calculate(String input) {
+        InputBuffer _ib = InputBuffer.instance();
+        String result = "0.0";
+        if (_ib.getTotalOperator() + 1 == _ib.getTotalOperand()) {
+            result = "okay";
+        } else {
+            result = "Please type valid operation";
+        }
+        return result;
+    }
+
     void _showInputString() {
         InputBuffer _ib = InputBuffer.instance();
         if (isNum == true) {
-            // super.setBuffer(Integer.toString(number));
-            _ib.setBuffer(Integer.toString(number), false);
+
+            /*
+             * check for last character in buffer and decide whether it is another operand
+             * or same one
+             */
+            if (_ib.getBuffer() == "") {
+                _ib.setBuffer(Integer.toString(number), false);
+                _ib.setTotalOperand(1);
+            } else {
+                if (Character.isDigit(_ib.getBuffer().charAt(_ib.getBuffer().length() - 1)) != true) {
+
+                    _ib.setTotalOperand(_ib.getTotalOperand() + 1);
+                }
+                _ib.setBuffer(Integer.toString(number), false);
+            }
 
         } else if (operator != "=") {
-            // super.setBuffer(operator);
-            _ib.setBuffer(operator, false);
-        } else if (operator == "=") {
 
+            _ib.setBuffer(operator, false);
+            _ib.setTotalOperator(_ib.getTotalOperator() + 1);
+        } else if (operator == "=") {
+            super.setResult(_calculate(_ib.getBuffer()));
             _ib.setBuffer("", true);
         }
 
-        // super.setInput();
     }
 }
 
 class InputBuffer extends Calculator {
     private String _buffer = "";
+    private int _operator = 0;
+    private int _operand = 0;
     private static InputBuffer _instance = null;
 
     public static InputBuffer instance() {
@@ -194,6 +220,8 @@ class InputBuffer extends Calculator {
     public void setBuffer(String str, boolean clear) {
         if (clear == true) {
             _buffer = "";
+            _operand = 0;
+            _operator = 0;
         } else {
             _buffer += str;
 
@@ -203,5 +231,23 @@ class InputBuffer extends Calculator {
 
     public String getBuffer() {
         return _buffer;
+    }
+
+    public void setTotalOperator(int val) {
+        _operator = val;
+        System.out.println("number of operators " + _operator);
+    }
+
+    public int getTotalOperator() {
+        return _operator;
+    }
+
+    public void setTotalOperand(int val) {
+        _operand = val;
+        System.out.println("number of operands " + _operand);
+    }
+
+    public int getTotalOperand() {
+        return _operand;
     }
 }
