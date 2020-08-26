@@ -29,6 +29,7 @@ public class Calculator {
     static void _initWindow() {
         _frame.setBackground(Color.WHITE);
         _frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         _frame.setSize(new Dimension(windowWidth, windowHeight));
         _frame.setResizable(false);
         _frame.setVisible(true);
@@ -66,7 +67,7 @@ public class Calculator {
         input.setText("0");
         _display.add(result);
         _display.add(input);
-
+        _display.setLayout(new BorderLayout());
         _frame.add(_display, BorderLayout.NORTH);
 
     }
@@ -138,6 +139,7 @@ public class Calculator {
         _initWindow();
         _loadComponents();
         _addButtons();
+        _frame.setLayout(new BorderLayout());
         _frame.repaint();
         _handleEvents();
     }
@@ -164,11 +166,11 @@ class ButtonEvent implements ActionListener {
         InputBuffer _ib = InputBuffer.instance();
         if (isNum == true) {
             // super.setBuffer(Integer.toString(number));
-            _ib.setBuffer(Integer.toString(number),false);
+            _ib.setBuffer(Integer.toString(number), false);
 
         } else if (operator != "=") {
             // super.setBuffer(operator);
-            _ib.setBuffer(operator,false);
+            _ib.setBuffer(operator, false);
         } else if (operator == "=") {
 
             _ib.setBuffer("", true);
