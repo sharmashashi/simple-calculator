@@ -3,7 +3,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
+import javax.script.*;
 
 public class Calculator {
     static JFrame _frame = new JFrame("Open Calculator");
@@ -47,7 +47,7 @@ public class Calculator {
                 _tempMap.put("=", new JButton("="));
                 _tempMap.put("+", new JButton("+"));
                 _tempMap.put("-", new JButton("-"));
-                _tempMap.put("x", new JButton("x"));
+                _tempMap.put("*", new JButton("*"));
                 _tempMap.put("/", new JButton("/"));
                 _tempMap.get("=").setForeground(Color.blue);
                 ;
@@ -87,8 +87,8 @@ public class Calculator {
                 _btnFromTop += (10 + buttonHeight);
                 breakPoint++;
             } else if (breakPoint == 1 && i % 4 == 0) {
-                _btns.get("x").setBounds(_btnFromLeft, _btnFromTop, buttonWidth, buttonHeight);
-                _frame.add(_btns.get("x"));
+                _btns.get("*").setBounds(_btnFromLeft, _btnFromTop, buttonWidth, buttonHeight);
+                _frame.add(_btns.get("*"));
                 _btnFromLeft = 10;
                 _btnFromTop += (10 + buttonHeight);
                 breakPoint++;
@@ -128,7 +128,7 @@ public class Calculator {
             _btns.get(Integer.toString(i)).addActionListener(new ButtonEvent(true, i, null));
         }
         _btns.get("/").addActionListener(new ButtonEvent(false, -1, "/"));
-        _btns.get("x").addActionListener(new ButtonEvent(false, -1, "x"));
+        _btns.get("*").addActionListener(new ButtonEvent(false, -1, "*"));
         _btns.get("+").addActionListener(new ButtonEvent(false, -1, "+"));
         _btns.get("-").addActionListener(new ButtonEvent(false, -1, "-"));
         _btns.get("=").addActionListener(new ButtonEvent(false, -1, "="));
@@ -162,11 +162,29 @@ class ButtonEvent extends Calculator implements ActionListener {
         _showInputString();
     }
 
+    Integer _operandExtractor(int pos) {
+        int _val = -1;
+
+        return _val;
+    }
+
+    Character _operatorExtractor(int pos) {
+        char _val = 'a';
+        return _val;
+    }
+
     String _calculate(String input) {
         InputBuffer _ib = InputBuffer.instance();
         String result = "0.0";
         if (_ib.getTotalOperator() + 1 == _ib.getTotalOperand()) {
-            result = "okay";
+
+            ScriptEngineManager manager = new ScriptEngineManager();
+            ScriptEngine engine = manager.getEngineByName("JavaScript");
+            try {
+                result = String.valueOf(engine.eval(_ib.getBuffer()));
+            } catch (ScriptException e) {
+                e.printStackTrace();
+            }
         } else {
             result = "Please type valid operation";
         }
